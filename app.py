@@ -137,8 +137,8 @@ def list_unclassified(username):
 
     db = mysql_connect()
     cursor = db.cursor()
-    sql = "SELECT id, name FROM photos WHERE user='" + username + "' AND user_classification=-1"
-    cursor.execute(sql)
+    sql = "SELECT id, name FROM photos WHERE user=%(username)s AND user_classification=-1"
+    cursor.execute(sql, {'username': username})
     paths = cursor.fetchall()
     # print(paths)
     return paths
@@ -153,8 +153,8 @@ def download_by_path(filename):
 def download_by_id(photo_id):
     db = mysql_connect()
     cursor = db.cursor()
-    sql = "SELECT name FROM photos WHERE id=" +  photo_id
-    cursor.execute(sql)
+    sql = "SELECT name FROM photos WHERE id=%(photo_id)s"
+    cursor.execute(sql, {'photo_id': photo_id})
     filename = cursor.fetchone()[0]
     print(filename)
     if filename is None:
