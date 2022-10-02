@@ -14,6 +14,7 @@ import gridfs
 # from markupsafe import escape
 
 UPLOAD_FOLDER = '\\uploads\\unclassified'
+BASE_FOLDER = '\\uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
@@ -29,6 +30,17 @@ def classification_to_int(classification_string):
         return 2
     else:
         return -1
+
+
+def int_to_classification(class_int):
+    if class_int == 0:
+        return "Trash"
+    elif class_int == 1:
+        return "Recycle"
+    elif class_int == 2:
+        return "Compost"
+    else:
+        return "Unclassified"
 
 
 def mysql_connect():
@@ -52,7 +64,7 @@ def db_test():
     cursor = db.cursor()
 
     sql = "INSERT INTO photos " \
-          "(date, user, machine_classification, path) VALUES " \
+          "(create_date, username, machine_classification, path) VALUES " \
           "(%s, %s, %s, %s)"
     val = (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), "admin", 1, "C:/uploads/unclassified/photo.jpg")
     cursor.execute(sql, val)
@@ -89,7 +101,7 @@ def upload_file(username):
             db = mysql_connect()
             cursor = db.cursor()
             sql = "INSERT INTO photos " \
-                  "(date, user, machine_classification, path, name) VALUES " \
+                  "(create_date, username, machine_classification, path, filename) VALUES " \
                   "(%s, %s, %s, %s, %s)"
             val = (timestamp,
                    username,
@@ -132,24 +144,24 @@ def upload_file(username):
     '''
 
 
-@app.route('/list_unclassified/<path:username>', methods=['GET'])
+@app.route('/list_unclassified/<path:username>', methods=['GET', 'POST'])
 def list_unclassified(username):
 
     db = mysql_connect()
     cursor = db.cursor()
-    sql = "SELECT id, name FROM photos WHERE user=%(username)s AND user_classification=-1"
+    sql = "SELECT id, name FROM photos WHERE username=%(username)s AND user_classification=-1"
     cursor.execute(sql, {'username': username})
     paths = cursor.fetchall()
     # print(paths)
     return paths
 
 
-@app.route('/download_by_name/<path:filename>', methods=['GET'])
+@app.route('/download_by_name/<path:filename>', methods=['GET', 'POST'])
 def download_by_path(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
-@app.route('/download_by_id/<path:photo_id>', methods=['GET'])
+@app.route('/download_by_id/<path:photo_id>', methods=['GET', 'POST'])
 def download_by_id(photo_id):
     db = mysql_connect()
     cursor = db.cursor()
@@ -180,3 +192,47 @@ def download_by_id(photo_id):
     #
     # return send_file(raw_image, download_name='image.jpg', as_attachment=True)
 
+
+@app.route('/classify/<path:photo_id>/<path:class_int>', methods=['GET', 'POST'])
+def classify_image(photo_id, class_int):
+    db = mysql_connect()
+    cursor = db.cursor()
+    classification = int_to_classification(int(class_int))
+    if classification != "Unclassified":
+        sql = "UPDATE photos SET user_classification=%s WHERE id=%s"
+        val = (photo_id, class_int)
+        cursor.execute(sql, val)
+        if cursor.rowcount == 1:
+            cursor.execute("SELECT name FROM photos WHERE id=%(photo_id)s", {'photo_id': photo_id})
+            filename = cursor.fetchone()[0]
+            os.rename(UPLOAD_FOLDER + "\\" + filename, BASE_FOLDER + "\\" + classification + "\\" + filename)
+        db.commit()
+        return str(cursor.rowcount)
+    return '-1'
+
+
+@app.route('/delete/<path:photo_id>', methods=['GET', 'POST'])
+def delete_image(photo_id):
+    db = mysql_connect()
+    cursor = db.cursor()
+    cursor.execute("SELECT path FROM photos WHERE id=%(photo_id)s AND user_classification=-1", {'photo_id': photo_id})
+    path = cursor.fetchone()
+    if path is not None:
+        os.remove(path[0])
+        cursor.execute("DELETE FROM photos WHERE id=%s", [photo_id])
+        db.commit()
+    return str(cursor.rowcount)
+
+
+@app.route('/data/<path:username>/<path:class_int>/<path:days>', methods=['GET', 'POST'])
+def data(username, class_int, days):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = "SELECT * FROM photos WHERE " \
+          "username=%s AND " \
+          "machine_classification=%s AND " \
+          "create_date >= DATE_SUB(NOW(), INTERVAL %s DAY)"
+    val = (username, class_int, days)
+    cursor.execute(sql, val)
+    past_data = cursor.fetchall()
+    return past_data
