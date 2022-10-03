@@ -60,20 +60,7 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def db_test():
-    db = mysql_connect()
-    cursor = db.cursor()
-
-    sql = "INSERT INTO photos " \
-          "(create_date, username, machine_classification, path) VALUES " \
-          "(%s, %s, %s, %s)"
-    val = (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), "admin", 1, "C:/uploads/unclassified/photo.jpg")
-    cursor.execute(sql, val)
-
-    #db.commit()
-
-    print(cursor.execute("SELECT * FROM photos"))
-
-    return 'database test'
+    return 'hello world'
 
 
 @app.route('/upload/<path:username>', methods=['GET', 'POST'])
@@ -149,7 +136,7 @@ def list_unclassified(username):
 
     db = mysql_connect()
     cursor = db.cursor()
-    sql = "SELECT id, name FROM photos WHERE username=%(username)s AND user_classification=-1"
+    sql = "SELECT id, filename FROM photos WHERE username=%(username)s AND user_classification=-1"
     cursor.execute(sql, {'username': username})
     paths = cursor.fetchall()
     # print(paths)
@@ -165,9 +152,12 @@ def download_by_path(filename):
 def download_by_id(photo_id):
     db = mysql_connect()
     cursor = db.cursor()
-    sql = "SELECT name FROM photos WHERE id=%(photo_id)s"
-    cursor.execute(sql, {'photo_id': photo_id})
-    filename = cursor.fetchone()[0]
+    sql = "SELECT filename FROM photos WHERE id=%s"
+    cursor.execute(sql, [photo_id])
+    try:
+        filename = cursor.fetchone()[0]
+    except TypeError:
+        filename = ""
     print(filename)
     if filename is None:
         filename = ""
@@ -200,12 +190,14 @@ def classify_image(photo_id, class_int):
     classification = int_to_classification(int(class_int))
     if classification != "Unclassified":
         sql = "UPDATE photos SET user_classification=%s WHERE id=%s"
-        val = (photo_id, class_int)
+        val = (class_int, photo_id)
         cursor.execute(sql, val)
         if cursor.rowcount == 1:
-            cursor.execute("SELECT name FROM photos WHERE id=%(photo_id)s", {'photo_id': photo_id})
+            cursor.execute("SELECT filename FROM photos WHERE id=%(photo_id)s", {'photo_id': photo_id})
             filename = cursor.fetchone()[0]
-            os.rename(UPLOAD_FOLDER + "\\" + filename, BASE_FOLDER + "\\" + classification + "\\" + filename)
+            newpath = BASE_FOLDER + "\\" + classification + "\\" + filename
+            cursor.execute("UPDATE photos SET path='" + newpath + "' WHERE id=%(photo_id)s", {"photo_id": photo_id})
+            os.rename(UPLOAD_FOLDER + "\\" + filename, newpath)
         db.commit()
         return str(cursor.rowcount)
     return '-1'
