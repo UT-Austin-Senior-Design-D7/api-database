@@ -44,7 +44,7 @@ def mysql_connect():
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="12lego34",
+        password="BINIT_Password",
         database="binit"
     )
     return mydb
