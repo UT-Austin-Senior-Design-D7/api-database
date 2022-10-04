@@ -3,12 +3,9 @@ import time
 import io
 
 import mysql.connector
-import mysqlx.helpers
-from pymongo import MongoClient
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file
 from werkzeug.utils import secure_filename
 import magic_classification_machine
-import gridfs
 # from PIL import Image
 # import moto_moto as boto
 # from markupsafe import escape
