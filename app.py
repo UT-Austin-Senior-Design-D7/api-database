@@ -10,8 +10,8 @@ import magic_classification_machine
 # import moto_moto as boto
 # from markupsafe import escape
 
-UPLOAD_FOLDER = '\\uploads\\unclassified'
-BASE_FOLDER = '\\uploads'
+UPLOAD_FOLDER = '/uploads/unclassified'
+BASE_FOLDER = '/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
@@ -192,9 +192,9 @@ def classify_image(photo_id, class_int):
         if cursor.rowcount == 1:
             cursor.execute("SELECT filename FROM photos WHERE id=%(photo_id)s", {'photo_id': photo_id})
             filename = cursor.fetchone()[0]
-            newpath = BASE_FOLDER + "\\" + classification + "\\" + filename
+            newpath = BASE_FOLDER + "/" + classification + "/" + filename
             cursor.execute("UPDATE photos SET path='" + newpath + "' WHERE id=%(photo_id)s", {"photo_id": photo_id})
-            os.rename(UPLOAD_FOLDER + "\\" + filename, newpath)
+            os.rename(UPLOAD_FOLDER + "/" + filename, newpath)
         db.commit()
         return str(cursor.rowcount)
     return '-1'
