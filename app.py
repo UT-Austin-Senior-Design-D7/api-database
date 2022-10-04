@@ -10,7 +10,7 @@ import magic_classification_machine
 # import moto_moto as boto
 # from markupsafe import escape
 
-UPLOAD_FOLDER = '/uploads/Unclassified'
+UPLOAD_FOLDER = '/home/ubuntu/uploads/Unclassified'
 BASE_FOLDER = '/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
