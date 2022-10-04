@@ -186,7 +186,7 @@ def classify_image(photo_id, class_int):
     cursor = db.cursor()
     classification = int_to_classification(int(class_int))
     if classification != "Unclassified":
-        sql = "UPDATE photos SET user_classification=%s WHERE id=%s"
+        sql = "UPDATE photos SET user_classification=%s WHERE id=%s AND user_classification=-1"
         val = (class_int, photo_id)
         cursor.execute(sql, val)
         if cursor.rowcount == 1:
