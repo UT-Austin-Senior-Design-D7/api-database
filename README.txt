@@ -1,8 +1,8 @@
 BINIT Ltd.
 
-This api connects the database and the waste classification system to any forward facing pieces of this project. While it may be functional, it is not intended as a finalized product. There are glaring security vunurabilities and wonky implementations.
+This api connects the database and the waste classification system to any forward facing pieces of this project. While it may be functional, it is not intended as a finalized product. There are glaring security vunuabilities and wonky implementations.
 
-As of right now, the ip address of the AWS instance in 3.131.128.222 and the port this runs through is 8000. When the instance is running, typing 'http://3.131.128.222:8000/' into a browser should display 'hello world!'. 
+As of right now, the ip address of the AWS instance in 3.131.128.222 and the port this runs through is 8000. When the instance is running, typing 'http://13.59.146.184/' into a browser should display 'hello world!'. 
 
 ROUTES
 
@@ -15,7 +15,7 @@ In a browser, this will display a little interface to upload a picture to the da
 It returns a dummy classification as of now, a random selection between 'Trash', 'Recycle', and 'Compost'
 
 '/list_unclassified/<username>'
-This will return a list of all the files in the database that that user has uploaded, but that haven't been manually classified. Each location in the list holds both the id of the file, as well as the name
+This will return a list of all the files in the database that that user has uploaded, ut that haven't been manually classified. Each location in the list holds both the id of the file, as well as the name
 
 If there are no files, it will return an empty list
 
