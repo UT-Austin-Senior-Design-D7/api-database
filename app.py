@@ -3,7 +3,7 @@ import time
 import io
 
 import mysql.connector
-from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file
+from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file, jsonify
 from werkzeug.utils import secure_filename
 import magic_classification_machine
 # from PIL import Image
@@ -15,6 +15,7 @@ BASE_FOLDER = '/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
+# app.run('0.0.0.0', debug=True, port=8000, ssl_context='adhoc')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -57,6 +58,11 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def db_test():
+    if request.method == 'GET':
+        return_data = {
+            "data": "hello world"
+        }
+        return jsonify(return_data)
     return 'hello world'
 
 
