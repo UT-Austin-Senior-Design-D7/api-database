@@ -58,12 +58,10 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def db_test():
-    if request.method == 'GET':
-        return_data = {
-            "data": "hello world"
-        }
-        return jsonify(return_data)
-    return 'hello world'
+    return_data = {
+        "data": "hello world"
+    }
+    return jsonify(return_data)
 
 
 @app.route('/upload/<path:username>', methods=['GET', 'POST'])
