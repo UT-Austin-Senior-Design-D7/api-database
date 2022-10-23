@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 import io
 
 import mysql.connector
@@ -13,6 +14,7 @@ import magic_classification_machine
 UPLOAD_FOLDER = '/home/ubuntu/uploads/Unclassified'
 BASE_FOLDER = '/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 app = Flask(__name__)
 # app.run('0.0.0.0', debug=True, port=8000, ssl_context='adhoc')
@@ -132,6 +134,87 @@ def upload_file(username):
     '''
 
 
+@app.route('/<path:username>/weekly_total', methods=['GET'])
+def weekly_total(username):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = 'SELECT id FROM photos WHERE username=%s AND create_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)'
+    cursor.execute(sql, [username])
+    cursor.fetchall()
+    return_data = {
+        "data": cursor.rowcount
+    }
+    return jsonify(return_data)
+
+
+@app.route('/<path:username>/monthly_total', methods=['GET'])
+def monthly_total(username):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = 'SELECT id FROM photos WHERE username=%s AND create_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)'
+    cursor.execute(sql, [username])
+    cursor.fetchall()
+    return_data = {
+        "data": cursor.rowcount
+    }
+    return jsonify(return_data)
+
+
+@app.route('/<path:username>/last_month_total', methods=['GET'])
+def last_month_total(username):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = 'SELECT id FROM photos ' \
+          'WHERE username=%s ' \
+          'AND create_date >= DATE_SUB(NOW(), INTERVAL 60 DAY)' \
+          'AND create_date <= DATE_SUB(NOW(), INTERVAL 30 DAY)'
+    cursor.execute(sql, [username])
+    cursor.fetchall()
+    return_data = {
+        "data": cursor.rowcount
+    }
+    return jsonify(return_data)
+
+
+@app.route('/<path:username>/waste_log_weekly', methods=['GET'])
+def waste_log_weekly(username):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = 'SELECT create_date, machine_classification FROM photos ' \
+          'WHERE username=%s AND create_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)'
+    cursor.execute(sql, [username])
+    return_list = []
+    for item in cursor.fetchall():
+        return_data = {
+            "date": item[0],
+            "type": int_to_classification(item[1])
+        }
+        return_list.append(return_data)
+    e = {
+        "list": return_list
+    }
+    return e
+
+
+@app.route('/<path:username>/unclassified', methods=["GET"])
+def unclassified(username):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = "SELECT id, filename FROM photos WHERE username=%(username)s AND user_classification=-1"
+    cursor.execute(sql, {'username': username})
+    return_list = []
+    for item in cursor.fetchall():
+        return_data = {
+            "id": item[0],
+            "filename": item[1]
+        }
+        return_list.append(return_data)
+    e = {
+        "list": return_list
+    }
+    return e
+
+
 @app.route('/list_unclassified/<path:username>', methods=['GET', 'POST'])
 def list_unclassified(username):
 
@@ -154,7 +237,7 @@ def download_by_id(photo_id):
     db = mysql_connect()
     cursor = db.cursor()
     sql = "SELECT filename FROM photos WHERE id=%s"
-    cursor.execute(sql, [photo_id])
+    cursor.execute(sql, [int(photo_id)])
     try:
         filename = cursor.fetchone()[0]
     except TypeError:
