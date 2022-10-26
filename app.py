@@ -12,8 +12,8 @@ import magic_classification_machine
 # from markupsafe import escape
 
 UPLOAD_FOLDER = '/home/ubuntu/uploads/Unclassified'
-BASE_FOLDER = '/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+BASE_FOLDER = '/home/ubuntu/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 app = Flask(__name__)
@@ -39,6 +39,8 @@ def int_to_classification(class_int):
         return "Recycle"
     elif class_int == 2:
         return "Compost"
+    elif class_int == -1:
+        return "DELETE"
     else:
         return "Unclassified"
 
@@ -215,16 +217,16 @@ def unclassified(username):
     return e
 
 
-@app.route('/list_unclassified/<path:username>', methods=['GET', 'POST'])
-def list_unclassified(username):
-
-    db = mysql_connect()
-    cursor = db.cursor()
-    sql = "SELECT id, filename FROM photos WHERE username=%(username)s AND user_classification=-1"
-    cursor.execute(sql, {'username': username})
-    paths = cursor.fetchall()
-    # print(paths)
-    return paths
+# @app.route('/list_unclassified/<path:username>', methods=['GET', 'POST'])
+# def list_unclassified(username):
+#
+#     db = mysql_connect()
+#     cursor = db.cursor()
+#     sql = "SELECT id, filename FROM photos WHERE username=%(username)s AND user_classification=-1"
+#     cursor.execute(sql, {'username': username})
+#     paths = cursor.fetchall()
+#     # print(paths)
+#     return paths
 
 
 @app.route('/download_by_name/<path:filename>', methods=['GET', 'POST'])
@@ -247,31 +249,14 @@ def download_by_id(photo_id):
         filename = ""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-    # # mongodb here!
-    # mongo_client = MongoClient(
-    #     "mongodb+srv://BINITAdmin:iNyp7QoHZ5ReLOSk@binit-cluster.tzibqip.mongodb.net/?retryWrites=true&w=majority")
-    # photo_database = mongo_client['Photo-Database']
-    # photo_collection = photo_database['Photos']
-    #
-    # fs = gridfs.GridFS(photo_database)
-    #
-    # file_grid = photo_collection.find({"filename": filename}, {"file-grid": 1})
-    #
-    # # print(file_grid.next())
-    #
-    # if file_grid is None:
-    #     return None
-    #
-    # raw_image = io.BytesIO(fs.get(file_grid.next().get('file-grid')).read())
-    #
-    # return send_file(raw_image, download_name='image.jpg', as_attachment=True)
-
 
 @app.route('/classify/<path:photo_id>/<path:class_int>', methods=['GET', 'POST'])
 def classify_image(photo_id, class_int):
     db = mysql_connect()
     cursor = db.cursor()
     classification = int_to_classification(int(class_int))
+    if classification == "DELETE":
+        return delete_image(photo_id)
     if classification != "Unclassified":
         sql = "UPDATE photos SET user_classification=%s WHERE id=%s AND user_classification=-1"
         val = (class_int, photo_id)
