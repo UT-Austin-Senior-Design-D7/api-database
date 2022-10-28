@@ -202,13 +202,14 @@ def waste_log_weekly(username):
 def unclassified(username):
     db = mysql_connect()
     cursor = db.cursor()
-    sql = "SELECT id, filename FROM photos WHERE username=%(username)s AND user_classification=-1"
+    sql = "SELECT id, filename, machine_classification FROM photos WHERE username=%(username)s AND user_classification=-1"
     cursor.execute(sql, {'username': username})
     return_list = []
     for item in cursor.fetchall():
         return_data = {
             "id": item[0],
-            "filename": item[1]
+            "filename": item[1],
+            "prediction": item[2]
         }
         return_list.append(return_data)
     e = {
@@ -297,3 +298,38 @@ def data(username, class_int, days):
     cursor.execute(sql, val)
     past_data = cursor.fetchall()
     return past_data
+
+
+@app.route('/register/<path:username>/<path:password>/<path:email>/<path:household_size>/<path:location>')
+def register(username, password, email, household_size, location):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = "SELECT id FROM users WHERE username=%s"
+    cursor.execute(sql, [username])
+    cursor.fetchall()
+    if cursor.rowcount != 0:
+        return {"data": 0}
+    sql = "SELECT id FROM users WHERE email=%s"
+    cursor.execute(sql, [email])
+    cursor.fetchall()
+    if cursor.rowcount != 0:
+        return {"data": 0}
+    sql = "INSERT INTO users (username, password, email, household_size, location)" \
+          "VALUES (%s, %s, %s, %s, %s)"
+    val = (username, password, email, household_size, location)
+    cursor.execute(sql, val)
+    db.commit()
+    return {"data": 1}
+
+
+@app.route('/login/<path:username>/<path:password>')
+def login(username, password):
+    db = mysql_connect()
+    cursor = db.cursor()
+    sql = "SELECT id FROM users WHERE username=%s AND password=%s"
+    val = (username, password)
+    cursor.execute(sql, val)
+    cursor.fetchall()
+    if cursor.rowcount == 1:
+        return {"data": 1}
+    return {"data": 0}
