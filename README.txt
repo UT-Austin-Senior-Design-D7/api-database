@@ -6,8 +6,9 @@ As of right now, the ip address of the AWS instance in 3.131.128.222 and the por
 
 ROUTES
 
+===================================================
 '/'
-Displays hello world; intended to simply be a test
+Returns hello world; intended to simply be a test
 
 ===================================================
 '/upload/<username>'
@@ -17,7 +18,7 @@ It returns a dummy classification as of now, a random selection between 'Trash',
 
 ===================================================
 '<username>/unclassified'
-This will return a list of all the files in the database that that user has uploaded, ut that haven't been manually classified. Each location in the list holds both the id of the file as well as the name
+This will return a list of all the files in the database that that user has uploaded, ut that haven't been manually classified. Each location in the list holds both the id of the file, the name, and the classification given by the machine
 
 If there are no files, it will return an empty list
 
@@ -62,4 +63,14 @@ Returns 1 on a success, 0 on a failure
 
 ===================================================
 '/data/<username>/<machine classification>/<days>'
-This returns the a list of all  the files that meet the parameters. It was uploaded by <username>, the machine classified it as <machine classification> (The same integers as <user classification> above) and it was within the last <days> days
+This returns a list of all  the files that meet the parameters. It was uploaded by <username>, the machine classified it as <machine classification> (The same integers as <user classification> above) and it was within the last <days> days
+
+===================================================
+'/register/<username>/<password>/<email>/<household_size>/<location>'
+This creates a user in the database with this information. Returns 1 if successful and 0 if either the username or the email are already in use
+!!!! DO NOT USE THIS IN A PRODUCTION ENVIRONMENT THIS IS SIMPLY A PROOF OF CONCEPT AND HAS GLARING SECURITY VULNERABILITIES !!!!
+
+===================================================
+'/login/<username>/<password>'
+This checks if the username and password are valid. Returns 1 if successful and 0 if not
+!!!! DO NOT USE THIS IN A PRODUCTION ENVIRONMENT THIS IS SIMPLY A PROOF OF CONCEPT AND HAS GLARING SECURITY VULNERABILITIES !!!!
