@@ -1,5 +1,6 @@
 import os
 import time
+import subprocess
 import datetime
 import io
 
@@ -68,8 +69,8 @@ def db_test():
     return jsonify(return_data)
 
 
-@app.route('/upload/<path:username>', methods=['GET', 'POST'])
-def upload_file(username):
+@app.route('/upload/<path:device_id>', methods=['GET', 'POST'])
+def upload_file(device_id):
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -82,16 +83,27 @@ def upload_file(username):
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
+            db = mysql_connect()
+            cursor = db.cursor()
+
+            sql = "SELECT username FROM users WHERE device_id=%s"
+            cursor.execute(sql, [device_id])
+            try:
+                username = cursor.fetchone()[0]
+            except TypeError:
+                return {"error": "There is no user associated with that device id"}
+
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
             file.filename = username + '_' + timestamp + '.' + file.filename.rsplit('.', 1)[1].lower()
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
+            # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
+            # print(process)
+
             classification = magic_classification_machine.classify(file)
 
-            db = mysql_connect()
-            cursor = db.cursor()
             sql = "INSERT INTO photos " \
                   "(create_date, username, machine_classification, path, filename) VALUES " \
                   "(%s, %s, %s, %s, %s)"
@@ -105,24 +117,6 @@ def upload_file(username):
             except mysql.connector.errors.IntegrityError:
                 return 'duplicate name'
             db.commit()
-
-            # # mongodb here!
-            # mongo_client = MongoClient("mongodb+srv://BINITAdmin:iNyp7QoHZ5ReLOSk@binit-cluster.tzibqip.mongodb.net/?retryWrites=true&w=majority")
-            # photo_database = mongo_client['Photo-Database']
-            # photo_collection = photo_database['Photos']
-            #
-            # # gridfs here!
-            # fs = gridfs.GridFS(photo_database)
-            #
-            # photo_info = {
-            #     'time': time.gmtime(),
-            #     'classification': magic_classification_machine.classify(file),
-            #     'user': 'unknown',
-            #     'filename': file.filename,
-            #     'file-grid': fs.put(open(file_path, 'rb').read())
-            # }
-            #
-            # photo_collection.insert_one(photo_info)
 
             return classification
     return '''
@@ -239,16 +233,16 @@ def download_by_path(filename):
 def download_by_id(photo_id):
     db = mysql_connect()
     cursor = db.cursor()
-    sql = "SELECT filename FROM photos WHERE id=%s"
+    sql = "SELECT path FROM photos WHERE id=%s"
     cursor.execute(sql, [int(photo_id)])
     try:
-        filename = cursor.fetchone()[0]
+        path = cursor.fetchone()[0]
     except TypeError:
-        filename = ""
-    print(filename)
-    if filename is None:
-        filename = ""
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        path = ""
+    if path is None:
+        path = ""
+    splitpath = path.rsplit('/', 1)
+    return send_from_directory(splitpath[0], splitpath[1])
 
 
 @app.route('/classify/<path:photo_id>/<path:class_int>', methods=['GET', 'POST'])
@@ -300,8 +294,9 @@ def data(username, class_int, days):
     return past_data
 
 
-@app.route('/register/<path:username>/<path:password>/<path:email>/<path:household_size>/<path:location>')
-def register(username, password, email, household_size, location):
+@app.route('/register/<path:username>/<path:password>/<path:email>/<path:household_size>/<path:location>/<path'
+           ':device_id>')
+def register(username, password, email, household_size, location, device_id):
     db = mysql_connect()
     cursor = db.cursor()
     sql = "SELECT id FROM users WHERE username=%s"
@@ -314,9 +309,14 @@ def register(username, password, email, household_size, location):
     cursor.fetchall()
     if cursor.rowcount != 0:
         return {"data": 0}
-    sql = "INSERT INTO users (username, password, email, household_size, location)" \
-          "VALUES (%s, %s, %s, %s, %s)"
-    val = (username, password, email, household_size, location)
+    sql = "SELECT id FROM users WHERE device_id=%s"
+    cursor.execute(sql, [device_id])
+    cursor.fetchall()
+    if cursor.rowcount != 0:
+        return {"data": 0}
+    sql = "INSERT INTO users (username, password, email, household_size, location, device_id)" \
+          "VALUES (%s, %s, %s, %s, %s, %s)"
+    val = (username, password, email, household_size, location, device_id)
     cursor.execute(sql, val)
     db.commit()
     return {"data": 1}
