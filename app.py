@@ -118,7 +118,7 @@ def upload_file(device_id):
                 return 'duplicate name'
             db.commit()
 
-            return classification
+            return {"classification": classification}
     return '''
     <!doctype html>
     <title>Upload new File</title>
