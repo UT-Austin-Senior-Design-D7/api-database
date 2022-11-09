@@ -8,6 +8,7 @@ import mysql.connector
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file, jsonify
 from werkzeug.utils import secure_filename
 import magic_classification_machine
+
 # from PIL import Image
 # import moto_moto as boto
 # from markupsafe import escape
@@ -23,25 +24,37 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def classification_to_int(classification_string):
-    if classification_string == "Trash":
+    if classification_string == "trash":
         return 0
-    elif classification_string == "Recycle":
+    elif classification_string == "paper":
         return 1
-    elif classification_string == "Compost":
+    elif classification_string == "cardboard":
         return 2
+    elif classification_string == "glass":
+        return 3
+    elif classification_string == "plastic":
+        return 4
+    elif classification_string == "metal":
+        return 5
     else:
         return -1
 
 
 def int_to_classification(class_int):
-    if class_int == 0:
-        return "Trash"
-    elif class_int == 1:
-        return "Recycle"
-    elif class_int == 2:
-        return "Compost"
-    elif class_int == -1:
+    if class_int == -1:
         return "DELETE"
+    elif class_int == 0:
+        return "trash"
+    elif class_int == 1:
+        return "paper"
+    elif class_int == 2:
+        return "cardboard"
+    elif class_int == 3:
+        return "glass"
+    elif class_int == 4:
+        return "plastic"
+    elif class_int == 5:
+        return "metal"
     else:
         return "Unclassified"
 
@@ -63,8 +76,10 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def db_test():
+    process = subprocess.run(["dir", ""], shell=True, capture_output=True, universal_newlines=True)
     return_data = {
-        "data": "hello world"
+        "data": "hello world",
+        "stdout": process.stdout
     }
     return jsonify(return_data)
 
@@ -102,14 +117,21 @@ def upload_file(device_id):
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
 
-            classification = magic_classification_machine.classify(file)
+            cmd = ["python3",
+                   "/home/ubuntu/RecycleNet/webcam.py --resume /home/ubuntu/RecycleNet/save/model_best.pth.tar --save_dir "
+                   + file_path + " --resize_needed True"]
+            process = subprocess.run(cmd, shell=True, capture_output=True, universal_newlines=True)
+            process_output = process.stdout
+            prediction = process_output.rsplit('\n', 1)[1].split(',')[0].split(' ')[1]
+
+            # classification = magic_classification_machine.classify(file)
 
             sql = "INSERT INTO photos " \
                   "(create_date, username, machine_classification, path, filename) VALUES " \
                   "(%s, %s, %s, %s, %s)"
             val = (timestamp,
                    username,
-                   classification_to_int(classification),
+                   classification_to_int(prediction),
                    file_path,
                    filename)
             try:
@@ -118,7 +140,7 @@ def upload_file(device_id):
                 return 'duplicate name'
             db.commit()
 
-            return {"classification": classification}
+            return {"classification": prediction}
     return '''
     <!doctype html>
     <title>Upload new File</title>
