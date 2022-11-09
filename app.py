@@ -123,8 +123,11 @@ def upload_file(device_id):
                    "/home/ubuntu/RecycleNet/webcam.py --resume /home/ubuntu/RecycleNet/save/model_best.pth.tar --save_dir "
                    + file_path + " --resize_needed True"]
             process = subprocess.run(cmd, shell=True, capture_output=True)
+
             process_output = process.stdout
-            print("checkpoint 2")
+            process_error = process.stderr
+            print(process_output)
+            print(process_error)
             try:
                 prediction = process_output.rsplit('\n', 1)[1].split(',')[0].split(' ')[1]
             except IndexError:
