@@ -114,7 +114,7 @@ def upload_file(device_id):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
-            print(file_path)
+            print("checkpoint 1")
 
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
@@ -124,6 +124,7 @@ def upload_file(device_id):
                    + file_path + " --resize_needed True"]
             process = subprocess.run(cmd, shell=True, capture_output=True, universal_newlines=True)
             process_output = process.stdout
+            print("checkpoint 2")
             try:
                 prediction = process_output.rsplit('\n', 1)[1].split(',')[0].split(' ')[1]
             except IndexError:
