@@ -114,12 +114,13 @@ def upload_file(device_id):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
-            print("checkpoint 1")
+            print("===== checkpoint 1 =====")
 
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
 
             cmd = ["python3 /home/ubuntu/RecycleNet/webcam.py --resume /home/ubuntu/RecycleNet/save/model_best.pth.tar --save_dir " + file_path + " --resize_needed True"]
+            print(cmd)
             process = subprocess.run(cmd, shell=True, capture_output=True)
 
             process_output = process.stdout
