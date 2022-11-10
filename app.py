@@ -3,6 +3,7 @@ import time
 import subprocess
 import datetime
 import io
+import sys
 
 import mysql.connector
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file, jsonify
@@ -118,6 +119,8 @@ def upload_file(device_id):
 
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
+
+            sys.path.insert(0, "/home/ubuntu/RecycleNet")
 
             cmd = ["python3",
                    "/home/ubuntu/RecycleNet/webcam.py",
