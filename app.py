@@ -4,6 +4,7 @@ import subprocess
 import datetime
 import io
 import sys
+import torch
 
 
 import mysql.connector
@@ -125,10 +126,6 @@ def upload_file(device_id):
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
 
-
-
-            magic.main(file_path, True)
-
             cmd = ["python3",
                    "/home/ubuntu/RecycleNet/webcam.py",
                    "--resume /home/ubuntu/RecycleNet/save/model_best.pth.tar",
@@ -137,6 +134,7 @@ def upload_file(device_id):
                    "--resize_needed",
                    "True"]
             print(cmd)
+            print(os.environ["PATH"])
             process = subprocess.run(cmd, capture_output=True, env=os.environ, text=True)
 
             process_output = process.stdout
