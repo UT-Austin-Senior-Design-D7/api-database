@@ -16,10 +16,6 @@ import magic_classification_machine
 # import moto_moto as boto
 # from markupsafe import escape
 
-sys.path.insert(1, "/home/ubuntu/RecycleNet")
-
-import webcam as magic
-
 UPLOAD_FOLDER = '/home/ubuntu/uploads/Unclassified'
 BASE_FOLDER = '/home/ubuntu/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -134,8 +130,11 @@ def upload_file(device_id):
                    "--resize_needed",
                    "True"]
             print(cmd)
-            print(os.environ["PATH"])
-            process = subprocess.run(cmd, capture_output=True, env=os.environ, text=True)
+
+            env = os.environ.copy()
+            env["PATH"] = "/home/ubuntu/.local/lib/python3.10/site-packages:" + env["PATH"]
+
+            process = subprocess.run(cmd, capture_output=True, env=env, text=True)
 
             process_output = process.stdout
             process_error = process.stderr
