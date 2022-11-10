@@ -130,10 +130,10 @@ def upload_file(device_id):
                    "True"]
             print(cmd)
 
-            env = os.environ.copy()
-            env["PATH"] = "/home/ubuntu/.local/lib/python3.10/site-packages/torch:" + env["PATH"]
+            my_env = os.environ.copy()
+            my_env["PATH"] = "/home/ubuntu/.local/lib/python3.10/site-packages:/home/ubuntu/.local/lib/python3.10/site-packages/torch" + my_env["PATH"]
 
-            process = subprocess.run(cmd, capture_output=True, env=env, text=True)
+            process = subprocess.run(cmd, capture_output=True, env=my_env, text=True)
 
             process_output = process.stdout
             process_error = process.stderr
