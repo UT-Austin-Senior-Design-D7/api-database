@@ -4,7 +4,7 @@ import subprocess
 import datetime
 import io
 import sys
-from webcam import main
+
 
 import mysql.connector
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file, jsonify
@@ -15,7 +15,9 @@ import magic_classification_machine
 # import moto_moto as boto
 # from markupsafe import escape
 
-sys.path.insert(0, "/home/ubuntu/RecycleNet")
+sys.path.insert(1, "/home/ubuntu/RecycleNet")
+
+import webcam as magic
 
 UPLOAD_FOLDER = '/home/ubuntu/uploads/Unclassified'
 BASE_FOLDER = '/home/ubuntu/uploads'
