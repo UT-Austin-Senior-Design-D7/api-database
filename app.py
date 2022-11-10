@@ -4,7 +4,6 @@ import subprocess
 import datetime
 import io
 import sys
-import torch
 
 
 import mysql.connector
