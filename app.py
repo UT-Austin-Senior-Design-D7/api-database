@@ -127,6 +127,7 @@ def upload_file(device_id):
                    "--resize_needed",
                    "True"]
             print(cmd)
+            print(os.environ)
             process = subprocess.run(cmd, capture_output=True, env=os.environ, text=True)
 
             process_output = process.stdout
