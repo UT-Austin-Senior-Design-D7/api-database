@@ -143,7 +143,7 @@ def upload_file(device_id):
 
             print(os.environ["PATH"])
 
-            process = subprocess.run(cmd, capture_output=True, env=os.environ, text=True)
+            process = subprocess.run(cmd, capture_output=True, env=my_env, text=True)
 
             process_output = process.stdout
             process_error = process.stderr
