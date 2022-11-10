@@ -15,6 +15,8 @@ import magic_classification_machine
 # import moto_moto as boto
 # from markupsafe import escape
 
+sys.path.insert(0, "/home/ubuntu/RecycleNet")
+
 UPLOAD_FOLDER = '/home/ubuntu/uploads/Unclassified'
 BASE_FOLDER = '/home/ubuntu/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -121,7 +123,7 @@ def upload_file(device_id):
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
 
-            sys.path.insert(0, "/home/ubuntu/RecycleNet")
+
 
             magic.main(file_path, True)
 
