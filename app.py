@@ -119,11 +119,7 @@ def upload_file(device_id):
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
 
-            cmd = ["python3",
-                   "/home/ubuntu/RecycleNet/webcam.py",
-                   "--resume /home/ubuntu/RecycleNet/save/model_best.pth.tar",
-                   "--save_dir " + file_path,
-                   "--resize_needed True"]
+            cmd = ["python3 /home/ubuntu/RecycleNet/webcam.py --resume /home/ubuntu/RecycleNet/save/model_best.pth.tar --save_dir " + file_path + " --resize_needed True"]
             process = subprocess.run(cmd, shell=True, capture_output=True)
 
             process_output = process.stdout
