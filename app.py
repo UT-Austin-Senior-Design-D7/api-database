@@ -4,6 +4,7 @@ import subprocess
 import datetime
 import io
 import sys
+import webcam.py as magic
 
 import mysql.connector
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file, jsonify
@@ -121,6 +122,8 @@ def upload_file(device_id):
             # print(process)
 
             sys.path.insert(0, "/home/ubuntu/RecycleNet")
+
+            magic.main(file_path, True)
 
             cmd = ["python3",
                    "/home/ubuntu/RecycleNet/webcam.py",
