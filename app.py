@@ -133,13 +133,15 @@ def upload_file(device_id):
                    "True"]
             print(cmd)
 
-            # my_env = os.environ.copy()
-            # my_env["PATH"] = "/home/ubuntu/.local/lib/python3.10/site-packages:" \
-            #                  "/home/ubuntu/.local/lib/python3.10/site-packages/torch:" \
-            #                  "/usr/lib/python3/dist-packages/pip/_vendor:" \
-            #                  "/usr/lib/python3/dist-packages/pip/_vendor/pyparsing:" + my_env["PATH"]
+            my_env = os.environ.copy()
+            my_env["PATH"] = "/home/ubuntu/.local/lib/python3.10/site-packages:" \
+                             "/home/ubuntu/.local/lib/python3.10/site-packages/torch:" \
+                             "/usr/lib/python3/dist-packages/pip/_vendor:" \
+                             "/usr/lib/python3/dist-packages/pip/_vendor/pyparsing:" + my_env["PATH"]
             sys.path.insert(1, "/home/ubuntu/.local/lib/python3.10/site-packages")
             sys.path.insert(1, "/home/ubuntu/RecycleNet")
+
+            print(os.environ["PATH"])
 
             process = subprocess.run(cmd, capture_output=True, env=os.environ, text=True)
 
