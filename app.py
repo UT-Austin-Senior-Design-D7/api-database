@@ -141,7 +141,7 @@ def upload_file(device_id):
             sys.path.insert(1, "/home/ubuntu/.local/lib/python3.10/site-packages")
             sys.path.insert(1, "/home/ubuntu/RecycleNet")
 
-            print(os.environ["PATH"])
+            print(my_env["PATH"])
 
             process = subprocess.run(cmd, capture_output=True, env=my_env, text=True)
 
