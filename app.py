@@ -4,7 +4,7 @@ import subprocess
 import datetime
 import io
 import sys
-import webcam.py as magic
+from webcam import main
 
 import mysql.connector
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, send_file, jsonify
