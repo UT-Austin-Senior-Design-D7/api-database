@@ -138,7 +138,7 @@ def upload_file(device_id):
             my_env = os.environ.copy()
             my_env["PATH"] = "/home/ubuntu/.local/lib/python3.10/site-packages:" \
                              "/home/ubuntu/.local/lib/python3.10/site-packages/torch:" \
-                             "/usr/lib/python3/dist-packages/pip/_vendor:" + my_env["PATH"]
+                             "/usr/lib/python3/dist-packages/pip/_vendor/pyparsing:" + my_env["PATH"]
 
             process = subprocess.run(cmd, capture_output=True, env=my_env, text=True)
 
