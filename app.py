@@ -18,8 +18,6 @@ import magic_classification_machine
 sys.path.insert(1, "/home/ubuntu/.local/lib/python3.10/site-packages")
 sys.path.insert(1, "/home/ubuntu/RecycleNet")
 
-import webcam as magic
-
 UPLOAD_FOLDER = '/home/ubuntu/uploads/Unclassified'
 BASE_FOLDER = '/home/ubuntu/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
