@@ -119,7 +119,7 @@ def upload_file(device_id):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
-            print("===== checkpoint 1 =====")
+            # print("===== checkpoint 1 =====")
 
             # process = subprocess.run(['echo', 'the pain train'], stdout=subprocess.PIPE, universal_newlines=True)
             # print(process)
@@ -148,22 +148,22 @@ def upload_file(device_id):
 
             process_output = process.stdout
             process_error = process.stderr
-            print("OUTPUT:")
-            print(process_output)
-            print("ERROR:")
-            print(process_error)
+            # print("OUTPUT:")
+            # print(process_output)
+            # print("ERROR:")
+            # print(process_error)
             try:
                 prediction = process_output.rsplit('\n', 2)[1]
-                print(prediction)
+                # print(prediction)
                 prediction = prediction.split(',')[0]
-                print(prediction)
+                # print(prediction)
                 prediction = prediction.split(' ')[1]
-                print(prediction)
+                # print(prediction)
             except IndexError:
                 return {"error": "The pain train"}
             # classification = magic_classification_machine.classify(file)
 
-            print("===== checkpoint 2 =====")
+            # print("===== checkpoint 2 =====")
 
             sql = "INSERT INTO photos " \
                   "(create_date, username, machine_classification, path, filename) VALUES " \
