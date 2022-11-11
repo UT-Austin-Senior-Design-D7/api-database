@@ -132,7 +132,7 @@ def upload_file(device_id):
                    file_path,
                    "--resize_needed",
                    "True"]
-            print(cmd)
+            # print(cmd)
 
             my_env = os.environ.copy()
             my_env["PATH"] = "/home/ubuntu/.local/lib/python3.10/site-packages:" \
@@ -142,19 +142,28 @@ def upload_file(device_id):
             sys.path.insert(1, "/home/ubuntu/.local/lib/python3.10/site-packages")
             sys.path.insert(1, "/home/ubuntu/RecycleNet")
 
-            print(my_env["PATH"])
+            # print(my_env["PATH"])
 
             process = subprocess.run(cmd, capture_output=True, env=my_env, text=True)
 
             process_output = process.stdout
             process_error = process.stderr
+            print("OUTPUT:")
             print(process_output)
+            print("ERROR:")
             print(process_error)
             try:
-                prediction = process_output.rsplit('\n', 1)[1].split(',')[0].split(' ')[1]
+                prediction = process_output.rsplit('\n', 1)[1]
+                print(prediction)
+                prediction = prediction.split(',')[0]
+                print(prediction)
+                prediction = prediction.split(' ')[1]
+                print(prediction)
             except IndexError:
                 return {"error": "The pain train"}
             # classification = magic_classification_machine.classify(file)
+
+            print("===== checkpoint 2 =====")
 
             sql = "INSERT INTO photos " \
                   "(create_date, username, machine_classification, path, filename) VALUES " \
