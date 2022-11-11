@@ -126,7 +126,8 @@ def upload_file(device_id):
 
             cmd = ["python3",
                    "/home/ubuntu/RecycleNet/webcam.py",
-                   "--resume /home/ubuntu/RecycleNet/save/model_best.pth.tar",
+                   "--resume",
+                   "/home/ubuntu/RecycleNet/save/model_best.pth.tar",
                    "--save_dir",
                    file_path,
                    "--resize_needed",
