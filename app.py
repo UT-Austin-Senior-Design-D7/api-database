@@ -153,7 +153,7 @@ def upload_file(device_id):
             print("ERROR:")
             print(process_error)
             try:
-                prediction = process_output.rsplit('\n', 1)[1]
+                prediction = process_output.rsplit('\n', 2)[1]
                 print(prediction)
                 prediction = prediction.split(',')[0]
                 print(prediction)
